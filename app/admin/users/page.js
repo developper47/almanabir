@@ -11,30 +11,55 @@ export default function AdminUsersPage() {
   useEffect(() => {
     const userRole = localStorage.getItem('userRole');
     if (userRole !== 'admin') {
-      router.push('/admin'); // إرجاع إذا لم يكن مديراً
+      router.push('/admin'); 
     } else {
       setIsLoading(false);
-      const savedUsers = localStorage.getItem('users');
-      if (savedUsers) {
-        setUsers(JSON.parse(savedUsers));
-      }
+      // جلب المستخدمين من الخادم السحابي
+      fetch('/api/users')
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                setUsers(data.data);
+            }
+        })
+        .catch(err => console.error("خادم المستخدمين معطل."));
     }
   }, [router]);
 
-  const handleApprove = (email) => {
-    const updatedUsers = users.map(u => u.email === email ? { ...u, verified: true } : u);
-    setUsers(updatedUsers);
-    localStorage.setItem('users', JSON.stringify(updatedUsers));
+  const handleApprove = async (email) => {
+    try {
+      const res = await fetch('/api/users', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, verified: true })
+      });
+      const data = await res.json();
+      if(data.success) {
+        setUsers(users.map(u => u.email === email ? data.data : u));
+      } else {
+        alert("فشل التنشيط.");
+      }
+    } catch(err) {
+      alert("تعذر الاتصال بقاعدة البيانات لتنشيط الحساب.");
+    }
   };
 
-  const handleDelete = (email) => {
+  const handleDelete = async (email) => {
     if (email === 'admin@almanabir.com') {
       return alert('لا يمكن حذف حساب المدير العام.');
     }
-    if (confirm('هل أنت متأكد من حذف هذا العضو؟')) {
-      const updatedUsers = users.filter(u => u.email !== email);
-      setUsers(updatedUsers);
-      localStorage.setItem('users', JSON.stringify(updatedUsers));
+    if (confirm('هل أنت متأكد من حذف هذا العضو بشكل نهائي من القاعدة السحابية؟')) {
+      try {
+        const res = await fetch(`/api/users?email=${encodeURIComponent(email)}`, { method: 'DELETE' });
+        const data = await res.json();
+        if(data.success) {
+          setUsers(users.filter(u => u.email !== email));
+        } else {
+          alert('فشل عملية الحذف.');
+        }
+      } catch(err) {
+        alert("خطأ في الخادم.");
+      }
     }
   };
 

@@ -32,29 +32,49 @@ export default function AdminKhutabPage() {
       if (savedCats) {
          setCategories(JSON.parse(savedCats));
       } else {
-         const defCats = ["العبادات"];
-         setCategories(defCats);
+         setCategories(["العبادات"]);
       }
       
-      const savedKhutab = localStorage.getItem('khutab');
-      if (savedKhutab) {
-        setKhutab(JSON.parse(savedKhutab));
-      }
+      // جلب الخطب الحقيقية من MongoDB السحابية
+      fetch('/api/khutab')
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) setKhutab(data.data);
+        })
+        .catch(err => console.error("تأكد من إعدادات قاعدة البيانات."));
     }
   }, [router]);
 
-  const handleDelete = (id) => {
-    if (confirm('هل أنت متأكد من حذف هذه الخطبة نهائياً؟')) {
-      const newK = khutab.filter(k => k.id !== id);
-      setKhutab(newK);
-      localStorage.setItem('khutab', JSON.stringify(newK));
+  const handleDelete = async (id) => {
+    if (confirm('هل أنت متأكد من حذف هذه الخطبة نهائياً من قاعدة البيانات السحابية؟')) {
+      try {
+        const res = await fetch(`/api/khutab/${id}`, { method: 'DELETE' });
+        const data = await res.json();
+        if (data.success) {
+           setKhutab(khutab.filter(k => k._id !== id));
+        } else {
+           alert("تعذر الحذف.");
+        }
+      } catch(err) {
+        alert("حدث خطأ في الاتصال بالخادم.");
+      }
     }
   };
 
-  const handleApprove = (id) => {
-    const newK = khutab.map(k => k.id === id ? { ...k, status: 'منشور' } : k);
-    setKhutab(newK);
-    localStorage.setItem('khutab', JSON.stringify(newK));
+  const handleApprove = async (id) => {
+    try {
+      const res = await fetch(`/api/khutab/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: 'منشور' })
+      });
+      const data = await res.json();
+      if(data.success) {
+         setKhutab(khutab.map(k => k._id === id ? data.data : k));
+      }
+    } catch(err) {
+      alert("حدث خطأ أثناء الموافقة.");
+    }
   };
 
   const openAddModal = () => {
@@ -64,7 +84,7 @@ export default function AdminKhutabPage() {
   };
 
   const openEditModal = (khutba) => {
-    setEditingId(khutba.id);
+    setEditingId(khutba._id);
     const files = khutba.files || {};
     setFormData({ 
       title: khutba.title, 
@@ -81,10 +101,9 @@ export default function AdminKhutabPage() {
     setIsModalOpen(true);
   };
 
-  const handleSaveKhutba = (e) => {
+  const handleSaveKhutba = async (e) => {
     e.preventDefault();
     
-    // تجميع الملفات والمرفقات 
     const files = {};
     if (formData.youtubeUrl) files.youtube = formData.youtubeUrl;
     if (formData.audioUrl) files.audio = formData.audioUrl;
@@ -99,20 +118,41 @@ export default function AdminKhutabPage() {
       status: formData.status,
       content: formData.content,
       files: files,
-      date: new Date().toLocaleDateString('en-CA') // Format YYYY-MM-DD
+      date: new Date().toLocaleDateString('en-CA')
     };
 
-    let newKhutab;
-    if (editingId) {
-      newKhutab = khutab.map(k => k.id === editingId ? { ...k, ...khutbaDataToSave } : k);
-    } else {
-      const newKhutba = { ...khutbaDataToSave, id: Date.now().toString(), views: 0 };
-      newKhutab = [newKhutba, ...khutab];
+    try {
+      if (editingId) {
+        // تحديث الخطبة السحابية
+        const res = await fetch(`/api/khutab/${editingId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(khutbaDataToSave)
+        });
+        const data = await res.json();
+        if(data.success) {
+          setKhutab(khutab.map(k => k._id === editingId ? data.data : k));
+        } else {
+          alert('تعذر تحديث الخطبة: ' + data.error);
+        }
+      } else {
+        // إضافة خطبة سحابية جديدة
+        const res = await fetch('/api/khutab', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(khutbaDataToSave)
+        });
+        const data = await res.json();
+        if(data.success) {
+          setKhutab([data.data, ...khutab]);
+        } else {
+          alert('تعذر حفظ الخطبة: ' + data.error);
+        }
+      }
+      setIsModalOpen(false);
+    } catch(err) {
+       alert("حدث خطأ في الاتصال بالشبكة ولم يتم الحفظ.");
     }
-    
-    setKhutab(newKhutab);
-    localStorage.setItem('khutab', JSON.stringify(newKhutab));
-    setIsModalOpen(false);
   };
 
   if (isLoading) return <div style={{ padding: '4rem', textAlign: 'center' }}>جاري التحميل...</div>;
@@ -123,6 +163,7 @@ export default function AdminKhutabPage() {
         <div>
           <a href="/admin" style={{ color: 'var(--text-muted)', fontSize: '0.9rem', marginBottom: '0.5rem', display: 'inline-block' }}>&rarr; العودة للوحة الإدارة</a>
           <h1>إدارة الخطب</h1>
+          <p style={{ color: 'var(--text-muted)' }}>متصلة بقاعدة البيانات السحابية (MongoDB)</p>
         </div>
         <button onClick={openAddModal} className="btn btn-primary">إضافة خطبة جديدة +</button>
       </div>
@@ -141,7 +182,7 @@ export default function AdminKhutabPage() {
             </thead>
             <tbody>
               {khutab.map(k => (
-                <tr key={k.id} style={{ borderBottom: '1px solid #edf2f7' }}>
+                <tr key={k._id} style={{ borderBottom: '1px solid #edf2f7' }}>
                   <td style={{ padding: '1rem', fontWeight: 'bold' }}>{k.title}</td>
                   <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{k.category}</td>
                   <td style={{ padding: '1rem', color: 'var(--text-muted)' }}>{k.preacher}</td>
@@ -153,10 +194,10 @@ export default function AdminKhutabPage() {
                   <td style={{ padding: '1rem' }}>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
                       {k.status === 'معلق' && (
-                        <button onClick={() => handleApprove(k.id)} className="btn btn-primary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}>موافقة</button>
+                        <button onClick={() => handleApprove(k._id)} className="btn btn-primary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}>موافقة</button>
                       )}
                       <button onClick={() => openEditModal(k)} className="btn btn-outline" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}>تعديل</button>
-                      <button onClick={() => handleDelete(k.id)} className="btn btn-outline" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', color: 'red', borderColor: 'red' }}>حذف</button>
+                      <button onClick={() => handleDelete(k._id)} className="btn btn-outline" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', color: 'red', borderColor: 'red' }}>حذف</button>
                     </div>
                   </td>
                 </tr>
@@ -170,7 +211,6 @@ export default function AdminKhutabPage() {
         </div>
       </div>
 
-      {/* النافذة المنبثقة */}
       {isModalOpen && (
         <div style={{
           position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -179,14 +219,12 @@ export default function AdminKhutabPage() {
         }}>
           <div className="card" style={{ width: '100%', maxWidth: '800px', maxHeight: '95vh', overflowY: 'auto', padding: '2rem', margin: '1rem', animation: 'fadeIn 0.2s ease-out' }}>
             <h2 style={{ marginBottom: '1.5rem', borderBottom: '1px solid #edf2f7', paddingBottom: '1rem' }}>
-              {editingId ? 'تعديل الخطبة والمرفقات' : 'إضافة خطبة جديدة والمرفقات'}
+              {editingId ? 'تعديل الخطبة (MongoDB)' : 'إضافة خطبة جديدة'}
             </h2>
             
             <form onSubmit={handleSaveKhutba} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               
-              {/* قسم المعلومات الأساسية */}
               <div style={{ background: '#f8f9fa', padding: '1.5rem', borderRadius: 'var(--radius-md)' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '1rem', color: 'var(--primary-blue)' }}>المعلومات الأساسية</h3>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
                   <div style={{ flex: '1 1 300px' }}>
                     <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>عنوان الخطبة</label>
@@ -212,10 +250,8 @@ export default function AdminKhutabPage() {
                 </div>
               </div>
 
-              {/* قسم المرفقات */}
               <div style={{ background: '#f0fff4', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid #c6f6d5' }}>
                 <h3 style={{ fontSize: '1rem', marginBottom: '1rem', color: 'var(--primary-green)' }}>المرفقات والوسائط (روابط خارجية - اختيارية)</h3>
-                
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
                   <div style={{ flex: '1 1 300px' }}>
                     <label style={{ display: 'block', marginBottom: '0.5rem', fontSize: '0.9rem' }}>🎥 رابط يوتيوب (YouTube)</label>
@@ -240,21 +276,20 @@ export default function AdminKhutabPage() {
                 </div>
               </div>
 
-              {/* قسم النص */}
               <div>
                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>النص المكتوب (مضمون الخطبة)</label>
                 <textarea 
                   value={formData.content}
                   onChange={(e) => setFormData({...formData, content: e.target.value})}
                   rows="8"
-                  placeholder="اكتب هنا محتوى الخطبة لكي يتمكن المصلون من قراءتها..."
+                  placeholder="اكتب المحتوى هنا..."
                   style={{ width: '100%', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid #cbd5e0', outline: 'none', resize: 'vertical' }} 
                   required
                 ></textarea>
               </div>
 
               <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-                <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '1rem' }}>حفظ الخطبة والمرفقات</button>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1, padding: '1rem' }}>حفظ الخطبة</button>
                 <button type="button" onClick={() => setIsModalOpen(false)} className="btn btn-outline" style={{ flex: 1, padding: '1rem' }}>إلغاء</button>
               </div>
             </form>

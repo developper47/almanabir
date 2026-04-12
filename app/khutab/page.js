@@ -2,17 +2,21 @@
 
 import { useEffect, useState } from 'react';
 
-export default function KhutabPage({ searchParams }) {
+export default function KhutabPage() {
   const [khutab, setKhutab] = useState([]);
   const [categories, setCategories] = useState([]);
   const [isClient, setIsClient] = useState(false);
-
-  // تحديث التصفية والبحث في العميل
-  const currentCategory = searchParams?.category || '';
-  const currentSearch = searchParams?.search || '';
+  
+  const [currentCategory, setCurrentCategory] = useState('');
+  const [currentSearch, setCurrentSearch] = useState('');
 
   useEffect(() => {
     setIsClient(true);
+    
+    // سحب التصنيفات ومعاملات البحث من الرابط بطريقة آمنة
+    const urlParams = new URL(window.location.href).searchParams;
+    setCurrentCategory(urlParams.get('category') || '');
+    setCurrentSearch(urlParams.get('search') || '');
     // جلب الخطب المنشورة من قاعدة البيانات العميقة
     fetch('/api/khutab?status=منشور')
       .then(res => res.json())

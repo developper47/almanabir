@@ -1,0 +1,11 @@
+[
+  {
+    "id": "admin-1",
+    "email": "admin@almanabir.com",
+    "password": "$2a$10$D8bT.e9.pB/m0d.lZ2VNxODPEX9tL/M3x.nZJ6Uu2dC2uB1Qy3/hS", 
+    "name": "المدير العام",
+    "role": "admin",
+    "createdAt": "2026-04-11T10:00:00Z"
+  }
+]
+// password is: admin123

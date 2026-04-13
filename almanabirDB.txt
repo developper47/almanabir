@@ -1,3 +1,6 @@
 almanabirDB
 Mongo@2030#
 mongodb+srv://almanabirDB:<db_password>@cluster0.dzhz0eg.mongodb.net/?appName=Cluster0
+
+
+41.227.162.180/32

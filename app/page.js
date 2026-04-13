@@ -1,9 +1,22 @@
-export default function Home() {
-  const latestKhutab = [
-    { id: 1, title: 'فضل الصيام وأحكامه', preacher: 'الشيخ أحمد محمد', date: '2026-04-10', category: 'العبادات', views: 120 },
-    { id: 2, title: 'التوبة الصادقة وشروطها', preacher: 'د. محمود علي', date: '2026-04-03', category: 'الأخلاق والآداب', views: 340 },
-    { id: 3, title: 'حقوق الجار في الإسلام', preacher: 'الشيخ عمر حسن', date: '2026-03-27', category: 'الأسرة والمجتمع', views: 215 },
-  ];
+import dbConnect from '../lib/mongodb';
+import Khutba from '../models/Khutba';
+
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  let latestKhutab = [];
+  
+  try {
+    await dbConnect();
+    
+    // جلب آخر 3 خطب منشورة
+    latestKhutab = await Khutba.find({ status: 'منشور' })
+      .sort({ createdAt: -1 })
+      .limit(3)
+      .lean();
+  } catch (error) {
+    console.error("Home page DB error:", error);
+  }
 
   return (
     <div>
@@ -20,10 +33,6 @@ export default function Home() {
               <a href="/khutab" className="btn btn-primary">تصفح الخطب</a>
               <a href="/auth" className="btn btn-gold">شارك معنا</a>
             </div>
-          </div>
-          
-          <div style={{ display: 'none' }} className="animate-fade-in">
-            {/* Can add a nice geometric Islamic pattern or large logo here in a full setup */}
           </div>
         </div>
       </section>
@@ -55,7 +64,7 @@ export default function Home() {
 
           <div className="grid-3">
             {latestKhutab.map((khutba) => (
-              <div key={khutba.id} className="card">
+              <div key={khutba._id.toString()} className="card">
                 <div style={{ height: '160px', background: 'var(--primary-blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', position: 'relative' }}>
                   <img src="/logo.png" style={{ height: '80px', opacity: 0.2, filter: 'brightness(0) invert(1)' }} alt="" />
                   <span className="badge" style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'white' }}>
@@ -68,12 +77,12 @@ export default function Home() {
                     <span>👤 {khutba.preacher}</span>
                     <span>📅 {khutba.date}</span>
                   </div>
-                  <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem', lineHeight: '1.6' }}>
-                    مقتطف قصير من الخطبة يعطي نبذة عن محتواها وأهم النقاط التي سيتم مناقشتها فيها...
+                  <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem', lineHeight: '1.6', display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
+                    {khutba.content}
                   </p>
                   
                   <div style={{ marginTop: 'auto', borderTop: '1px solid #edf2f7', paddingTop: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <a href={`/khutab/${khutba.id}`} className="btn" style={{ background: '#edf2f7', color: 'var(--primary-blue)', padding: '0.5rem 1rem', fontSize: '0.9rem' }}>
+                    <a href={`/khutab/${khutba._id}`} className="btn" style={{ background: '#edf2f7', color: 'var(--primary-blue)', padding: '0.5rem 1rem', fontSize: '0.9rem' }}>
                       اقرأ المزيد
                     </a>
                     <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>👁️ {khutba.views} مشاهدة</span>

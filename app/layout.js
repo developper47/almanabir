@@ -1,4 +1,5 @@
 import './globals.css';
+import Navbar from '../components/Navbar';
 
 export const metadata = {
   title: 'المنابر | منصة للحوار والتعبير',
@@ -8,27 +9,8 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="ar" dir="rtl">
-      <body>
-        <nav style={{ background: 'white', boxShadow: 'var(--shadow-sm)', padding: '1rem 0', position: 'sticky', top: 0, zIndex: 50 }}>
-          <div className="container flex-between">
-            <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-              <img src="/logo.png" alt="شعار المنابر" style={{ height: '50px' }} />
-              <h2 style={{ margin: 0, color: 'var(--primary-blue)', fontSize: '1.5rem' }}>المنابر</h2>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center', fontWeight: '600', color: 'var(--primary-blue)' }}>
-              <a href="/">الرئيسية</a>
-              <a href="/about">من نحن</a>
-              <a href="/khutab">الخطب</a>
-              <a href="/prayer-times">أوقات الصلاة</a>
-              <a href="/contact">اتصل بنا</a>
-            </div>
-
-            <div style={{ display: 'flex', gap: '1rem' }}>
-              <a href="/auth" className="btn btn-outline" style={{ padding: '0.5rem 1rem' }}>تسجيل الدخول</a>
-            </div>
-          </div>
-        </nav>
+      <body style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <Navbar />
 
         <main style={{ flex: 1 }}>{children}</main>
 

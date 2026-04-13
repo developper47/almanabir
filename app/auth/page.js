@@ -17,7 +17,11 @@ export default function AuthPage() {
   const [usersDb, setUsersDb] = useState([]);
 
   useEffect(() => {
-    // Remove mock users initialization since we use raw DB now.
+    // التحقق مما إذا كان المستخدم قد تم تفعيل حسابه للتو
+    const urlParams = new URL(window.location.href).searchParams;
+    if (urlParams.get('verified') === 'true') {
+      setSuccess('تم تفعيل بريدك الإلكتروني بنجاح! يمكنك الآن تسجيل الدخول.');
+    }
   }, []);
 
   const handleSubmit = async (e) => {
@@ -38,6 +42,7 @@ export default function AuthPage() {
           localStorage.setItem('isAuthenticated', 'true');
           localStorage.setItem('userRole', data.user.role);
           localStorage.setItem('userName', data.user.name);
+          localStorage.setItem('userEmail', data.user.email); // Added to store email for profile actions
           router.push('/admin');
         } else {
           setError(data.error || 'خطأ في المصادقة');
@@ -55,7 +60,7 @@ export default function AuthPage() {
         const data = await res.json();
         
         if (data.success) {
-          setSuccess('تم التسجيل بنجاح! حسابك بانتظار موافقة الإدارة.');
+          setSuccess('تم التسجيل بنجاح! يرجى مراجعة بريدك الإلكتروني لتفعيل الحساب.');
           setName('');
           setEmail('');
           setPassword('');

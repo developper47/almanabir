@@ -26,21 +26,21 @@ export default function AdminUsersPage() {
     }
   }, [router]);
 
-  const handleApprove = async (email) => {
+  const handleToggleActive = async (email, currentStatus) => {
     try {
       const res = await fetch('/api/users', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, verified: true })
+        body: JSON.stringify({ email, isActive: !currentStatus })
       });
       const data = await res.json();
       if(data.success) {
         setUsers(users.map(u => u.email === email ? data.data : u));
       } else {
-        alert("فشل التنشيط.");
+        alert("فشل تحديث الحالة.");
       }
     } catch(err) {
-      alert("تعذر الاتصال بقاعدة البيانات لتنشيط الحساب.");
+      alert("خطأ في الاتصال.");
     }
   };
 
@@ -80,7 +80,8 @@ export default function AdminUsersPage() {
                 <th style={{ padding: '1rem' }}>الاسم</th>
                 <th style={{ padding: '1rem' }}>البريد الإلكتروني</th>
                 <th style={{ padding: '1rem' }}>الصلاحية</th>
-                <th style={{ padding: '1rem' }}>الحالة</th>
+                <th style={{ padding: '1rem' }}>تأكيد البريد</th>
+                <th style={{ padding: '1rem' }}>حالة الحساب</th>
                 <th style={{ padding: '1rem' }}>الإجراءات</th>
               </tr>
             </thead>
@@ -95,17 +96,28 @@ export default function AdminUsersPage() {
                     </span>
                   </td>
                   <td style={{ padding: '1rem' }}>
-                    <span className="badge" style={{ background: u.verified ? '#f0fff4' : '#fff5f5', color: u.verified ? 'var(--primary-green)' : '#e53e3e' }}>
-                      {u.verified ? 'نشط' : 'بانتظار التأكيد'}
+                    <span className="badge" style={{ background: u.emailVerified ? '#f0fff4' : '#fff5f5', color: u.emailVerified ? 'var(--primary-green)' : '#e53e3e' }}>
+                      {u.emailVerified ? 'مؤكد' : 'غير مؤكد'}
+                    </span>
+                  </td>
+                  <td style={{ padding: '1rem' }}>
+                    <span className="badge" style={{ background: u.isActive ? '#f0fff4' : '#fff5f5', color: u.isActive ? 'var(--primary-green)' : '#e53e3e' }}>
+                      {u.isActive ? 'نشط' : 'معطل'}
                     </span>
                   </td>
                   <td style={{ padding: '1rem' }}>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      {!u.verified && (
-                        <button onClick={() => handleApprove(u.email)} className="btn btn-primary" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}>تنشيط الحساب</button>
-                      )}
                       {u.email !== 'admin@almanabir.com' && (
-                        <button onClick={() => handleDelete(u.email)} className="btn btn-outline" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', color: 'red', borderColor: 'red' }}>حذف</button>
+                        <>
+                          <button 
+                            onClick={() => handleToggleActive(u.email, u.isActive)} 
+                            className="btn btn-outline" 
+                            style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', color: u.isActive ? '#e53e3e' : 'var(--primary-green)', borderColor: u.isActive ? '#e53e3e' : 'var(--primary-green)' }}
+                          >
+                            {u.isActive ? 'تعطيل' : 'تفعيل'}
+                          </button>
+                          <button onClick={() => handleDelete(u.email)} className="btn btn-outline" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem', color: 'red', borderColor: 'red' }}>حذف</button>
+                        </>
                       )}
                     </div>
                   </td>

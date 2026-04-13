@@ -1,0 +1,57 @@
+﻿
+> almanabir@1.0.0 build
+> next build
+
+  ظû▓ Next.js 14.2.35
+  - Environments: .env.local
+
+   Creating an optimized production build ...
+ ظ£ô Compiled successfully
+   Linting and checking validity of types ...
+   Collecting page data ...
+node.exe : Error: Missing API key. Pass 
+it to the constructor `new 
+Resend("re_123")`
+Au caractère C:\Program 
+Files\nodejs\npm.ps1:29 : 3
++   & $NODE_EXE $NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecif 
+   ied: (Error: Missing ...send("re_12  
+  3")`:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCom 
+   mandError
+ 
+    at new <anonymous> (E:\almanabir\.ne
+xt\server\app\api\users\route.js:5:31040
+)
+    at 7115 (E:\almanabir\.next\server\a
+pp\api\users\route.js:5:30493)
+    at t (E:\almanabir\.next\server\webp
+ack-runtime.js:1:128)
+    at r (E:\almanabir\.next\server\app\
+api\users\route.js:13:1025)
+    at E:\almanabir\.next\server\app\api
+\users\route.js:13:1056
+    at t.X (E:\almanabir\.next\server\we
+bpack-runtime.js:1:1206)
+    at E:\almanabir\.next\server\app\api
+\users\route.js:13:1038
+    at Object.<anonymous> (E:\almanabir\
+.next\server\app\api\users\route.js:13:1
+083)
+    at Module._compile (node:internal/mo
+dules/cjs/loader:1554:14)
+    at Object..js (node:internal/modules
+/cjs/loader:1706:10)
+
+> Build error occurred
+Error: Failed to collect page data for 
+/api/users
+    at E:\almanabir\node_modules\next\di
+st\build\utils.js:1269:15
+    at 
+process.processTicksAndRejections (node:
+internal/process/task_queues:105:5) {
+  type: 'Error'
+}

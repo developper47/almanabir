@@ -10,18 +10,21 @@ export default function SingleKhutbaPage({ params }) {
 
   useEffect(() => {
     setIsClient(true);
-    const savedKhutab = localStorage.getItem('khutab');
-    if (savedKhutab) {
-      const allKhutab = JSON.parse(savedKhutab);
-      const found = allKhutab.find(k => k.id.toString() === params.id.toString());
-      setKhutba(found);
-
-      // زيادة عدد المشاهدات
-      if (found) {
-        const updatedKhutab = allKhutab.map(k => k.id === found.id ? { ...k, views: (k.views || 0) + 1 } : k);
-        localStorage.setItem('khutab', JSON.stringify(updatedKhutab));
+    
+    const fetchKhutba = async () => {
+      try {
+        const res = await fetch(`/api/khutab/${params.id}`);
+        const data = await res.json();
+        if (data.success) {
+          setKhutba(data.data);
+          // Increment views via API if needed, but for now we'll just display
+        }
+      } catch (err) {
+        console.error("Error fetching khutba:", err);
       }
-    }
+    };
+
+    fetchKhutba();
   }, [params.id]);
 
   if (!isClient) return <div style={{ padding: '4rem', textAlign: 'center' }}>جاري التحميل...</div>;

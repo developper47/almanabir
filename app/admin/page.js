@@ -41,12 +41,12 @@ export default function AdminDashboard() {
   return (
     <div style={{ background: '#f8f9fa', minHeight: '100vh', padding: '2rem 1.5rem' }}>
       <div className="container">
-        <div className="flex-between" style={{ marginBottom: '2rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem' }}>
+        <div className="flex-between stack-mobile" style={{ marginBottom: '2rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1rem', alignItems: 'flex-start' }}>
           <div>
             <h1 style={{ marginBottom: '0.5rem' }}>لوحة الإدارة</h1>
             <p style={{ color: 'var(--text-muted)' }}>مرحباً بك، {user.name} <span className="badge">{roleName}</span></p>
           </div>
-          <button onClick={handleLogout} className="btn btn-outline" style={{ borderColor: 'red', color: 'red' }}>
+          <button onClick={handleLogout} className="btn btn-outline" style={{ borderColor: 'red', color: 'red', width: 'auto' }}>
             تسجيل الخروج
           </button>
         </div>
@@ -101,17 +101,17 @@ export default function AdminDashboard() {
           <div style={{ padding: '1.5rem', borderBottom: '1px solid #edf2f7' }}>
             <h3 style={{ margin: 0 }}>آخر الخطب المضافة</h3>
           </div>
-          <div style={{ padding: '1.5rem' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', borderBottom: '1px solid #edf2f7' }}>
+          <div style={{ padding: '0 1.5rem 1.5rem' }}>
+            <div className="mobile-hide" style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', borderBottom: '1px solid #edf2f7' }}>
               <span style={{ fontWeight: 'bold' }}>عنوان الخطبة</span>
               <span style={{ fontWeight: 'bold' }}>الحالة</span>
               <span style={{ fontWeight: 'bold' }}>الإجراء</span>
             </div>
             {recentKhutab.map(item => (
-              <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderBottom: '1px solid #edf2f7' }}>
-                <span>{item.title}</span>
-                <span className="badge" style={{ background: item.status === 'معلق' ? '#fff5f5' : '#f0fff4', color: item.status === 'معلق' ? '#e53e3e' : 'var(--primary-green)' }}>{item.status}</span>
-                <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <div key={item.id} className="stack-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem', borderBottom: '1px solid #edf2f7', gap: '0.5rem' }}>
+                <span style={{ fontWeight: 'bold' }}>{item.title}</span>
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  <span className="badge" style={{ background: item.status === 'معلق' ? '#fff5f5' : '#f0fff4', color: item.status === 'معلق' ? '#e53e3e' : 'var(--primary-green)' }}>{item.status}</span>
                   <a href="/admin/khutab" className="btn btn-outline" style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}>مراجعة ←</a>
                 </div>
               </div>

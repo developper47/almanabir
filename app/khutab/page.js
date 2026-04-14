@@ -53,13 +53,13 @@ export default function KhutabPage() {
     <div className="container" style={{ padding: '3rem 1.5rem' }}>
       <div className="flex-between" style={{ marginBottom: '2rem' }}>
         <h1 style={{ marginBottom: 0 }}>مكتبة الخطب</h1>
-        <form className="glass-panel" style={{ padding: '0.5rem', display: 'flex', gap: '0.5rem' }}>
+        <form className="glass-panel stack-mobile" style={{ padding: '0.5rem', display: 'flex', gap: '0.5rem' }}>
            <input 
               type="text" 
               name="search"
               defaultValue={currentSearch}
               placeholder="ابحث عن خطبة..." 
-              style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid #e2e8f0', minWidth: '250px' }}
+              style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)', border: '1px solid #e2e8f0', minWidth: '200px', flex: 1 }}
             />
             <button type="submit" className="btn btn-primary" style={{ padding: '0.5rem 1rem' }}>بحث</button>
         </form>
@@ -67,7 +67,7 @@ export default function KhutabPage() {
 
       <div style={{ display: 'flex', gap: '2rem', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         {/* شريط التصنيفات الجانبي */}
-        <div className="card" style={{ width: '100%', maxWidth: '300px', flexShrink: 0 }}>
+        <div className="card sidebar" style={{ width: '100%', flexShrink: 0 }}>
           <div style={{ padding: '1.5rem', borderBottom: '1px solid #edf2f7', fontWeight: 'bold' }}>
             التصنيفات المتاحة
           </div>

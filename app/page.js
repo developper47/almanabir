@@ -23,13 +23,13 @@ export default async function Home() {
       {/* Hero Section */}
       <section className="hero">
         <div className="container flex-between" style={{ position: 'relative', zIndex: 1 }}>
-          <div style={{ maxWidth: '600px' }} className="animate-fade-in">
+          <div style={{ maxWidth: '600px', margin: '0 auto' }} className="animate-fade-in">
             <h1>بوابتكم لخطب الجمعة الشريفة</h1>
-            <p>
+            <p style={{ margin: '0 auto 2rem' }}>
               ارتقِ بمعرفتك الدينية واصل إلى أحدث خطب الجمعة من مصادر موثوقة. 
               نقدم لكم محتوى راقٍ ومنظم لخدمة الخطباء والمصلين.
             </p>
-            <div style={{ display: 'flex', gap: '1rem' }}>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'inherit', flexWrap: 'wrap' }}>
               <a href="/khutab" className="btn btn-primary">تصفح الخطب</a>
               <a href="/auth" className="btn btn-gold">شارك معنا</a>
             </div>
@@ -40,14 +40,14 @@ export default async function Home() {
       {/* Quick Search Section */}
       <section style={{ marginTop: '-2rem', position: 'relative', zIndex: 10 }}>
         <div className="container">
-          <form action="/khutab" method="GET" className="glass-panel" style={{ padding: '2rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <form action="/khutab" method="GET" className="glass-panel stack-mobile" style={{ padding: '2rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
             <input 
               name="search"
               type="text" 
               placeholder="ابحث عن عنوان خطبة، اسم خطيب، أو موضوع..." 
-              style={{ flex: 1, padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid #e2e8f0', fontSize: '1rem', outline: 'none' }}
+              style={{ width: '100%', flex: 1, padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid #e2e8f0', fontSize: '1rem', outline: 'none' }}
             />
-            <button type="submit" className="btn btn-primary" style={{ padding: '1rem 2rem' }}>
+            <button type="submit" className="btn btn-primary" style={{ padding: '1rem 2rem', width: 'auto', minWidth: '150px' }}>
               بحث
             </button>
           </form>

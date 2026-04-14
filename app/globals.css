@@ -58,6 +58,12 @@ h1 { font-size: 2.5rem; }
 h2 { font-size: 2rem; margin-bottom: 1.5rem; }
 h3 { font-size: 1.5rem; }
 
+@media (max-width: 768px) {
+  h1 { font-size: 1.8rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+}
+
 /* Buttons */
 .btn {
   display: inline-flex;
@@ -157,6 +163,13 @@ h3 { font-size: 1.5rem; }
   overflow: hidden;
 }
 
+@media (max-width: 768px) {
+  .hero {
+    padding: 3rem 0;
+    text-align: center;
+  }
+}
+
 .hero::after {
   content: '';
   position: absolute;
@@ -204,6 +217,19 @@ h3 { font-size: 1.5rem; }
   align-items: center;
 }
 
+@media (max-width: 768px) {
+  .flex-between {
+    flex-direction: column;
+    gap: 1.5rem;
+    text-align: center;
+  }
+  
+  .grid-3 {
+    gap: 1.5rem;
+    grid-template-columns: 1fr;
+  }
+}
+
 .badge {
   display: inline-block;
   padding: 0.25rem 0.75rem;
@@ -212,4 +238,95 @@ h3 { font-size: 1.5rem; }
   border-radius: 999px;
   font-size: 0.75rem;
   font-weight: 600;
+}
+
+/* responsive helpers */
+.mobile-hide {
+}
+
+.mobile-show {
+  display: none;
+}
+
+.stack-mobile {
+}
+
+@media (max-width: 768px) {
+  .mobile-hide {
+    display: none !important;
+  }
+  
+  .mobile-show {
+    display: block !important;
+  }
+  
+  .stack-mobile {
+    flex-direction: column;
+    width: 100%;
+  }
+}
+
+/* Navbar Responsive Styles */
+.nav-links {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+  font-weight: 600;
+  color: var(--primary-blue);
+}
+
+.nav-links a {
+  font-weight: 600;
+  color: var(--primary-blue);
+  text-decoration: none;
+}
+
+.nav-links a:hover {
+  color: var(--primary-green);
+}
+
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    flex-direction: column;
+    padding: 2rem;
+    box-shadow: var(--shadow-md);
+    gap: 1.5rem;
+    border-top: 1px solid #edf2f7;
+  }
+
+  .nav-links.open {
+    display: flex;
+  }
+
+  .nav-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+    border-top: 1px solid #edf2f7;
+    padding-top: 1.5rem;
+  }
+
+  .user-profile {
+    flex-direction: column;
+    width: 100%;
+    gap: 1rem;
+  }
+  
+  .nav-links .btn {
+    width: 100%;
+  }
+
+  .sidebar {
+    max-width: 100%;
+  }
+}
+
+.sidebar {
+  max-width: 300px;
 }

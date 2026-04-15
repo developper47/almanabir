@@ -64,15 +64,8 @@ function AdviceCard({ title, content }) {
 }
 
 export default function SuccessfulPreacherPage() {
-  const islamicPattern = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 80 80"><path d="M40 0 L45 35 L80 40 L45 45 L40 80 L35 45 L0 40 L35 35 Z M0 0 L15 15 M80 0 L65 15 M0 80 L15 65 M80 80 L65 65" fill="none" stroke="%23C8A85C" stroke-width="0.5" opacity="0.15"/></svg>')`;
-
   return (
-    <div style={{ 
-      backgroundImage: islamicPattern, 
-      backgroundAttachment: 'fixed',
-      minHeight: '100vh',
-      backgroundColor: 'var(--bg-col)'
-    }}>
+    <div>
       <div className="container" style={{ padding: '4rem 1.5rem', maxWidth: '900px' }}>
         <header style={{ 
           textAlign: 'center', 
@@ -103,7 +96,6 @@ export default function SuccessfulPreacherPage() {
           marginTop: '4rem', 
           textAlign: 'center', 
           backgroundColor: 'var(--primary-blue)', 
-          backgroundImage: islamicPattern.replace('opacity="0.15"', 'opacity="0.05"'),
           padding: '3rem 2rem', 
           borderRadius: 'var(--radius-lg)', 
           color: 'white',

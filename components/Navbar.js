@@ -52,6 +52,7 @@ export default function Navbar() {
         <div className={`nav-links ${isMenuOpen ? 'open' : ''}`}>
           <a href="/" onClick={() => setIsMenuOpen(false)}>الرئيسية</a>
           <a href="/about" onClick={() => setIsMenuOpen(false)}>من نحن</a>
+          <a href="/successful-preacher" onClick={() => setIsMenuOpen(false)}>الخطيب الناجح</a>
           <a href="/khutab" onClick={() => setIsMenuOpen(false)}>الخطب</a>
           <a href="/prayer-times" onClick={() => setIsMenuOpen(false)}>أوقات الصلاة</a>
           <a href="/contact" onClick={() => setIsMenuOpen(false)}>اتصل بنا</a>

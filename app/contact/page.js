@@ -4,20 +4,35 @@ import { useState } from 'react';
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({ name: '', email: '', subject: '', message: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newMessage = { ...formData, id: Date.now(), date: new Date().toLocaleDateString('ar-SA') };
+    setIsSubmitting(true);
     
-    // حفظ الرسالة في localStorage ليقرأها المدير
-    const savedMessages = JSON.parse(localStorage.getItem('messages') || '[]');
-    localStorage.setItem('messages', JSON.stringify([newMessage, ...savedMessages]));
-    
-    setSuccess(true);
-    setFormData({ name: '', email: '', subject: '', message: '' });
-    
-    setTimeout(() => setSuccess(false), 5000);
+    try {
+      const response = await fetch('/api/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+
+      if (response.ok) {
+        setSuccess(true);
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        setTimeout(() => setSuccess(false), 5000);
+      } else {
+        alert('حدث خطأ أثناء إرسال الرسالة. يرجى المحاولة مرة أخرى.');
+      }
+    } catch (error) {
+      console.error('Error submitting message:', error);
+      alert('فشل الاتصال بالخادم.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -81,8 +96,13 @@ export default function ContactPage() {
               ></textarea>
             </div>
 
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '1rem', marginTop: '1rem' }}>
-              إرسال الرسالة
+            <button 
+              type="submit" 
+              className="btn btn-primary" 
+              style={{ width: '100%', padding: '1rem', marginTop: '1rem' }}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? 'جاري الإرسال...' : 'إرسال الرسالة'}
             </button>
           </form>
         </div>

@@ -7,7 +7,8 @@ const UserSchema = new mongoose.Schema({
   role: { type: String, default: 'member' }, // admin, member, visitor
   emailVerified: { type: Boolean, default: false },
   isActive: { type: Boolean, default: true },
-  verificationToken: { type: String }
+  verificationToken: { type: String },
+  favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Khutba' }]
 }, { timestamps: true });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);

@@ -54,6 +54,7 @@ export default function Navbar() {
           <a href="/about" onClick={() => setIsMenuOpen(false)}>من نحن</a>
           <a href="/successful-preacher" onClick={() => setIsMenuOpen(false)}>الخطيب الناجح</a>
           <a href="/khutab" onClick={() => setIsMenuOpen(false)}>الخطب</a>
+          {user && <a href="/favorites" onClick={() => setIsMenuOpen(false)}>مكتبتي الخاصة</a>}
           <a href="/prayer-times" onClick={() => setIsMenuOpen(false)}>أوقات الصلاة</a>
           <a href="/contact" onClick={() => setIsMenuOpen(false)}>اتصل بنا</a>
           

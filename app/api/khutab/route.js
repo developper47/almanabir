@@ -9,10 +9,18 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const category = searchParams.get('category');
     const status = searchParams.get('status');
+    const search = searchParams.get('search');
     
     let filter = {};
     if (category) filter.category = category;
     if (status) filter.status = status;
+    if (search) {
+      filter.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { content: { $regex: search, $options: 'i' } },
+        { preacher: { $regex: search, $options: 'i' } }
+      ];
+    }
     
     const khutab = await Khutba.find(filter).sort({ createdAt: -1 });
     return NextResponse.json({ success: true, data: khutab });

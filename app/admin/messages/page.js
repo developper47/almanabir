@@ -13,19 +13,53 @@ export default function AdminMessagesPage() {
     if (userRole !== 'admin') {
       router.push('/admin');
     } else {
-      setIsLoading(false);
-      const savedMessages = localStorage.getItem('messages');
-      if (savedMessages) {
-        setMessages(JSON.parse(savedMessages));
-      }
+      fetchMessages();
     }
   }, [router]);
 
-  const handleDelete = (id) => {
+  const fetchMessages = async () => {
+    try {
+      setIsLoading(true);
+      const res = await fetch('/api/messages');
+      const json = await res.json();
+      if (json.success) {
+        setMessages(json.data);
+      }
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
     if (confirm('حذف هذه الرسالة؟')) {
-      const updatedMessages = messages.filter(m => m.id !== id);
-      setMessages(updatedMessages);
-      localStorage.setItem('messages', JSON.stringify(updatedMessages));
+      try {
+        const res = await fetch(`/api/messages/${id}`, { method: 'DELETE' });
+        const json = await res.json();
+        if (json.success) {
+          setMessages(messages.filter(m => m._id !== id));
+        }
+      } catch (error) {
+        console.error('Error deleting message:', error);
+      }
+    }
+  };
+
+  const toggleReadStatus = async (id, currentStatus) => {
+    const newStatus = currentStatus === 'read' ? 'unread' : 'read';
+    try {
+      const res = await fetch(`/api/messages/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      });
+      const json = await res.json();
+      if (json.success) {
+        setMessages(messages.map(m => m._id === id ? { ...m, status: newStatus } : m));
+      }
+    } catch (error) {
+      console.error('Error updating status:', error);
     }
   };
 
@@ -40,21 +74,53 @@ export default function AdminMessagesPage() {
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         {messages.map(msg => (
-          <div key={msg.id} className="card">
+          <div key={msg._id} className="card" style={{ 
+            borderRight: msg.status === 'unread' ? '5px solid var(--primary-green)' : '1px solid #edf2f7',
+            opacity: msg.status === 'read' ? 0.8 : 1
+          }}>
             <div className="card-body" style={{ padding: '1.5rem' }}>
               <div className="flex-between" style={{ borderBottom: '1px solid #edf2f7', paddingBottom: '1rem', marginBottom: '1rem' }}>
                 <div>
-                  <h3 style={{ margin: 0 }}>{msg.subject}</h3>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <h3 style={{ margin: 0 }}>{msg.subject}</h3>
+                    {msg.status === 'unread' && (
+                      <span style={{ 
+                        backgroundColor: 'var(--primary-green)', 
+                        color: 'white', 
+                        fontSize: '0.7rem', 
+                        padding: '0.2rem 0.5rem', 
+                        borderRadius: '10px',
+                        fontWeight: 'bold'
+                      }}>جديد</span>
+                    )}
+                  </div>
                   <div style={{ fontSize: '0.9rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
                     من: <strong>{msg.name}</strong> ({msg.email})
                   </div>
                 </div>
                 <div style={{ textAlign: 'left' }}>
-                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>{msg.date}</div>
-                  <button onClick={() => handleDelete(msg.id)} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer', fontSize: '0.85rem' }}>🗑️ حذف</button>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.5rem' }}>
+                    {new Date(msg.createdAt).toLocaleDateString('ar-SA')}
+                  </div>
+                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <button 
+                      onClick={() => toggleReadStatus(msg._id, msg.status)} 
+                      style={{ 
+                        background: 'none', 
+                        border: 'none', 
+                        color: 'var(--primary-blue)', 
+                        cursor: 'pointer', 
+                        fontSize: '0.85rem',
+                        textDecoration: 'underline'
+                      }}
+                    >
+                      {msg.status === 'read' ? 'تحديد كغير مقروء' : 'تحديد كمقروء'}
+                    </button>
+                    <button onClick={() => handleDelete(msg._id)} style={{ background: 'none', border: 'none', color: 'red', cursor: 'pointer', fontSize: '1rem' }} title="حذف">🗑️</button>
+                  </div>
                 </div>
               </div>
-              <p style={{ lineHeight: '1.8', whiteSpace: 'pre-wrap' }}>
+              <p style={{ lineHeight: '1.8', whiteSpace: 'pre-wrap', color: 'var(--text-main)' }}>
                 {msg.message}
               </p>
             </div>
@@ -63,7 +129,7 @@ export default function AdminMessagesPage() {
 
         {messages.length === 0 && (
           <div className="card" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-            لا يوجد رسائل جديدة في صندوق الوارد.
+            لا يوجد رسائل في صندوق الوارد.
           </div>
         )}
       </div>

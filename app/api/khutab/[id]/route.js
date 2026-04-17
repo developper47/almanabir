@@ -6,7 +6,8 @@ import Khutba from '../../../../models/Khutba';
 export async function GET(req, { params }) {
   try {
     await dbConnect();
-    const khutba = await Khutba.findById(params.id);
+    // جلب الخطبة وزيادة عدد المشاهدات تلقائياً
+    const khutba = await Khutba.findByIdAndUpdate(params.id, { $inc: { views: 1 } }, { new: true });
     if (!khutba) return NextResponse.json({ success: false, error: 'غير موجودة' }, { status: 404 });
     return NextResponse.json({ success: true, data: khutba });
   } catch (error) {

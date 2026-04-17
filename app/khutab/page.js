@@ -7,47 +7,55 @@ export default function KhutabPage() {
   const [categories, setCategories] = useState([]);
   const [isClient, setIsClient] = useState(false);
   
+  const [isLoading, setIsLoading] = useState(true);
+  
   const [currentCategory, setCurrentCategory] = useState('');
   const [currentSearch, setCurrentSearch] = useState('');
 
   useEffect(() => {
     setIsClient(true);
     
-    // سحب التصنيفات ومعاملات البحث من الرابط بطريقة آمنة
     const urlParams = new URL(window.location.href).searchParams;
-    setCurrentCategory(urlParams.get('category') || '');
-    setCurrentSearch(urlParams.get('search') || '');
-    // جلب الخطب المنشورة من قاعدة البيانات العميقة
-    fetch('/api/khutab?status=منشور')
-      .then(res => res.json())
-      .then(data => {
-         if (data.success) {
-            setKhutab(data.data);
-         }
-      })
-      .catch(err => console.error("Error fetching khutab:", err));
+    const cat = urlParams.get('category') || '';
+    const search = urlParams.get('search') || '';
+    
+    setCurrentCategory(cat);
+    setCurrentSearch(search);
 
-    // جلب التصنيفات
+    fetchKhutab(cat, search);
+    fetchCategories();
+  }, []);
+
+  const fetchKhutab = async (cat, search) => {
+    setIsLoading(true);
+    try {
+      let url = `/api/khutab?status=منشور`;
+      if (cat) url += `&category=${encodeURIComponent(cat)}`;
+      if (search) url += `&search=${encodeURIComponent(search)}`;
+      
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.success) {
+        setKhutab(data.data);
+      }
+    } catch (err) {
+      console.error("Error fetching khutab:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchCategories = async () => {
+    // جلب التصنيفات من localStorage مؤقتاً أو من API لو توفر
     const savedCats = localStorage.getItem('categories');
     if (savedCats) {
       setCategories(JSON.parse(savedCats));
     }
-  }, []);
+  };
 
   if (!isClient) return <div style={{ padding: '3rem', textAlign: 'center' }}>جاري التحميل...</div>;
 
-  let filteredKhutab = [...khutab];
-  if (currentCategory) {
-    filteredKhutab = filteredKhutab.filter(k => k.category === currentCategory);
-  }
-  if (currentSearch) {
-    const s = currentSearch.toLowerCase();
-    filteredKhutab = filteredKhutab.filter(k => 
-      k.title.toLowerCase().includes(s) || 
-      k.preacher.toLowerCase().includes(s) ||
-      (k.content && k.content.toLowerCase().includes(s))
-    );
-  }
+  const filteredKhutab = khutab; // Server-side handles filtering now
 
   return (
     <div className="container" style={{ padding: '3rem 1.5rem' }}>

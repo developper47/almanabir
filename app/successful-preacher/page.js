@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from 'react';
 
 function AdviceCard({ topic }) {
@@ -100,70 +102,6 @@ export default function ZadAlKhatibPage() {
             )}
           </div>
         )}
-
-        <footer style={{ 
-          marginTop: '4rem', 
-          textAlign: 'center', 
-          backgroundColor: 'var(--primary-blue)', 
-          padding: '3rem 2rem', 
-          borderRadius: 'var(--radius-lg)', 
-          color: 'white',
-          boxShadow: 'var(--shadow-lg)'
-        }}>
-          <h2 style={{ color: 'white', marginBottom: '1rem' }}>هل لديك نصيحة تود مشاركتها؟</h2>
-          <p style={{ marginBottom: '2rem', opacity: '0.9' }}>نحن نسعى دائماً لإثراء هذا المحتوى بخبراتكم وتجاربكم القيمة في الدعوة والخطابة.</p>
-          <a href="/contact" className="btn btn-gold">تواصل معنا الآن</a>
-        </footer>
-      </div>
-    </div>
-  );
-}
-
-            color: 'var(--primary-blue)', 
-            fontWeight: '700', 
-            cursor: 'pointer',
-            padding: '0',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            fontSize: '0.95rem'
-          }}
-        >
-          {isExpanded ? 'عرض أقل ↑' : 'اقرأ كاملاً ←'}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-export default function SuccessfulPreacherPage() {
-  return (
-    <div>
-      <div className="container" style={{ padding: '4rem 1.5rem', maxWidth: '900px' }}>
-        <header style={{ 
-          textAlign: 'center', 
-          marginBottom: '4rem', 
-          padding: '2rem',
-          backgroundColor: 'rgba(255, 255, 255, 0.7)',
-          backdropFilter: 'blur(5px)',
-          borderRadius: 'var(--radius-lg)',
-          boxShadow: 'var(--shadow-sm)',
-          border: '1px solid rgba(200, 168, 92, 0.2)'
-        }} className="animate-fade-in">
-          <h1 style={{ color: 'var(--primary-blue)', marginBottom: '1rem' }}>الخطيب الناجح</h1>
-          <div style={{ width: '80px', height: '4px', background: 'var(--accent-gold)', margin: '0 auto 1.5rem' }}></div>
-          <p style={{ fontSize: '1.2rem', color: 'var(--text-muted)', lineHeight: '1.6' }}>
-            نصائح وتوجيهات للارتقاء بالأداء المنبري وتحقيق أقصى درجات التأثير في جمهور المصلين.
-          </p>
-        </header>
-
-        <div className="grid-list">
-          {adviceData.map((advice, index) => (
-            <div key={index} className="animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
-              <AdviceCard title={advice.title} content={advice.content} />
-            </div>
-          ))}
-        </div>
 
         <footer style={{ 
           marginTop: '4rem', 

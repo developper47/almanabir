@@ -10,10 +10,16 @@ export async function GET(req) {
     const category = searchParams.get('category');
     const status = searchParams.get('status');
     const search = searchParams.get('search');
+    const isRare = searchParams.get('isRare');
+    const isMasterpiece = searchParams.get('isMasterpiece');
+    const isProphetic = searchParams.get('isProphetic');
     
     let filter = {};
     if (category) filter.category = category;
     if (status) filter.status = status;
+    if (isRare === 'true') filter.isRare = true;
+    if (isMasterpiece === 'true') filter.isMasterpiece = true;
+    if (isProphetic === 'true') filter.isProphetic = true;
     if (search) {
       filter.$or = [
         { title: { $regex: search, $options: 'i' } },

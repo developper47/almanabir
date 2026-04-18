@@ -9,6 +9,7 @@ export default function SingleKhutbaPage({ params }) {
   const [isClient, setIsClient] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
+  const [showRegisterMessage, setShowRegisterMessage] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -48,7 +49,7 @@ export default function SingleKhutbaPage({ params }) {
   const handleFavoriteToggle = async () => {
     const email = localStorage.getItem('userEmail');
     if (!email) {
-      router.push('/auth');
+      setShowRegisterMessage(true);
       return;
     }
 
@@ -153,8 +154,20 @@ export default function SingleKhutbaPage({ params }) {
             }}
             disabled={isFavoriteLoading}
           >
-            {isFavorite ? '⭐ في المفضلة' : '☆ أضف للمفضلة'}
+            {isFavorite ? '⭐ في مكتبتي' : '☆ أضف إلى مكتبتي'}
           </button>
+          
+          {showRegisterMessage && (
+            <div style={{
+              position: 'fixed', top: '20px', left: '50%', transform: 'translateX(-50%)',
+              background: '#e53e3e', color: 'white', padding: '1rem 2rem', borderRadius: 'var(--radius-md)',
+              boxShadow: 'var(--shadow-lg)', zIndex: 9999, display: 'flex', alignItems: 'center', gap: '1rem',
+              animation: 'fadeInDown 0.3s ease-out'
+            }}>
+              <span>يجب عليك تسجيل الدخول أو إنشاء حساب لإضافة الخطب إلى مكتبتك الخاصة.</span>
+              <button onClick={() => setShowRegisterMessage(false)} style={{ background: 'white', border: 'none', color: '#e53e3e', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>إغلاق</button>
+            </div>
+          )}
           <button 
             onClick={handlePrint}
             className="btn btn-gold"
@@ -162,6 +175,10 @@ export default function SingleKhutbaPage({ params }) {
           >
             🖨️ تجهيز للطباعة
           </button>
+        </div>
+
+        <div className="no-print" style={{ textAlign: 'center', padding: '0 2rem 1rem', color: 'var(--text-muted)', fontSize: '0.9rem', fontStyle: 'italic' }}>
+          💡 يمكنك إضافة الخطب التي تعجبك إلى مكتبتك للرجوع إليها لاحقاً.
         </div>
 
         {/* معلومات الخطبة Header */}

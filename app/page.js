@@ -111,6 +111,25 @@ export default async function Home() {
           </div>
         </div>
       </section>
+
+      {/* Quality Assurance Section */}
+      <section style={{ padding: '3rem 0', background: '#f0fff4' }}>
+        <div className="container">
+          <div style={{ 
+            padding: '2rem', 
+            borderRadius: 'var(--radius-lg)', 
+            border: '2px solid var(--primary-green)',
+            background: 'white',
+            textAlign: 'center',
+            boxShadow: 'var(--shadow-md)'
+          }}>
+            <h3 style={{ color: 'var(--primary-green)', marginBottom: '1rem' }}>💡 ضمان جودة المحتوى</h3>
+            <p style={{ fontSize: '1.2rem', color: 'var(--text-main)', lineHeight: '1.8', maxWidth: '800px', margin: '0 auto' }}>
+              جميع الخطب المقترحة تتم مراجعتها من طرف نخبة من العلماء الشرعيين مع امكانية تعديلها قبل نشرها لضمان جودة الخطب على الموقع.
+            </p>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

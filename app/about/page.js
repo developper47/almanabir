@@ -29,6 +29,12 @@ export default function AboutPage() {
             <li>مشاركة الخطباء المعتمدين لخطبهم لإثراء المنصة.</li>
           </ul>
 
+          <div style={{ background: '#f0fff4', padding: '1.5rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--primary-green)', marginBottom: '2rem' }}>
+            <p style={{ margin: 0, fontWeight: 'bold', color: 'var(--primary-green)', fontSize: '1.1rem' }}>
+              💡 جميع الخطب المقترحة تتم مراجعتها من طرف نخبة من العلماء الشرعيين مع امكانية تعديلها قبل نشرها لضمان جودة الخطب على الموقع.
+            </p>
+          </div>
+
           <h2 style={{ color: 'var(--primary-green)' }}>الجمهور المستهدف</h2>
           <p style={{ marginBottom: '2rem' }}>
             تم تصميم هذه المنصة لخدمة الأئمة والخطباء في إعداد دروسهم بخامات متينة، بالإضافة إلى الباحثين والمصلين الراغبين في التزود بالعلم الشرعي.

@@ -16,7 +16,8 @@ export default function AdminKhutabPage() {
   
   const initialFormState = { 
     title: '', category: '', preacher: '', status: 'منشور', content: '',
-    youtubeUrl: '', audioUrl: '', videoUrl: '', pdfUrl: '', wordUrl: ''
+    youtubeUrl: '', audioUrl: '', videoUrl: '', pdfUrl: '', wordUrl: '',
+    isRare: false, isMasterpiece: false, isProphetic: false
   };
   
   const [formData, setFormData] = useState(initialFormState);
@@ -96,7 +97,10 @@ export default function AdminKhutabPage() {
       audioUrl: files.audio || '',
       videoUrl: files.video || '',
       pdfUrl: files.pdf || '',
-      wordUrl: files.word || ''
+      wordUrl: files.word || '',
+      isRare: khutba.isRare || false,
+      isMasterpiece: khutba.isMasterpiece || false,
+      isProphetic: khutba.isProphetic || false
     });
     setIsModalOpen(true);
   };
@@ -118,6 +122,9 @@ export default function AdminKhutabPage() {
       status: formData.status,
       content: formData.content,
       files: files,
+      isRare: formData.isRare,
+      isMasterpiece: formData.isMasterpiece,
+      isProphetic: formData.isProphetic,
       date: new Date().toLocaleDateString('en-CA')
     };
 
@@ -247,6 +254,21 @@ export default function AdminKhutabPage() {
                       <option value="معلق">حفظ كمسودة (معلق)</option>
                     </select>
                   </div>
+                </div>
+
+                <div style={{ marginTop: '1.5rem', display: 'flex', flexWrap: 'wrap', gap: '2rem', padding: '1rem', background: 'white', borderRadius: 'var(--radius-md)', border: '1px dashed #cbd5e0' }}>
+                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 'bold', color: 'var(--primary-blue)' }}>
+                      <input type="checkbox" checked={formData.isRare} onChange={(e) => setFormData({...formData, isRare: e.target.checked})} style={{ width: '20px', height: '20px' }} />
+                      خطب نادرة
+                   </label>
+                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 'bold', color: 'var(--primary-blue)' }}>
+                      <input type="checkbox" checked={formData.isMasterpiece} onChange={(e) => setFormData({...formData, isMasterpiece: e.target.checked})} style={{ width: '20px', height: '20px' }} />
+                      روائع المنبر
+                   </label>
+                   <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontWeight: 'bold', color: 'var(--primary-blue)' }}>
+                      <input type="checkbox" checked={formData.isProphetic} onChange={(e) => setFormData({...formData, isProphetic: e.target.checked})} style={{ width: '20px', height: '20px' }} />
+                      خطب الرسول ﷺ
+                   </label>
                 </div>
               </div>
 

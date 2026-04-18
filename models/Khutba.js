@@ -8,6 +8,9 @@ const KhutbaSchema = new mongoose.Schema({
   status: { type: String, default: 'معلق' },
   views: { type: Number, default: 0 },
   date: { type: String },
+  isRare: { type: Boolean, default: false },
+  isMasterpiece: { type: Boolean, default: false },
+  isProphetic: { type: Boolean, default: false },
   files: {
     youtube: String,
     audio: String,

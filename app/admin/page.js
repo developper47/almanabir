@@ -8,6 +8,7 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState({ name: '', role: '' });
   const [recentKhutab, setRecentKhutab] = useState([]);
+  const [stats, setStats] = useState({ published: 0, pending: 0, categories: 0 });
 
   useEffect(() => {
     const isAuth = localStorage.getItem('isAuthenticated');
@@ -18,11 +19,29 @@ export default function AdminDashboard() {
         name: localStorage.getItem('userName') || 'مستخدم',
         role: localStorage.getItem('userRole') || 'member'
       });
-      const savedKhutab = localStorage.getItem('khutab');
-      if (savedKhutab) {
-         setRecentKhutab(JSON.parse(savedKhutab).slice(0, 4));
-      }
-      setIsLoading(false);
+      
+      // Fetch stats and recent sermons
+      const fetchData = async () => {
+        try {
+          const res = await fetch('/api/khutab');
+          const data = await res.json();
+          if (data.success) {
+            const khutab = data.data;
+            setRecentKhutab(khutab.slice(0, 5));
+            setStats({
+              published: khutab.filter(k => k.status === 'منشور').length,
+              pending: khutab.filter(k => k.status === 'معلق').length,
+              categories: [...new Set(khutab.map(k => k.category))].length
+            });
+          }
+        } catch (err) {
+          console.error("Dashboard fetch error:", err);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      fetchData();
     }
   }, [router]);
 
@@ -54,7 +73,7 @@ export default function AdminDashboard() {
         <div className="grid-3">
           <div className="card">
             <div className="card-body" style={{ textAlign: 'center' }}>
-              <h3 style={{ color: 'var(--primary-blue)', fontSize: '2.5rem' }}>12</h3>
+              <h3 style={{ color: 'var(--primary-blue)', fontSize: '2.5rem' }}>{stats.published}</h3>
               <p style={{ color: 'var(--text-muted)', fontWeight: 'bold' }}>الخطب المنشورة</p>
               <a href="/admin/khutab" className="btn btn-primary" style={{ display: 'block', width: '100%', marginTop: '1rem' }}>إدارة الخطب</a>
             </div>
@@ -62,20 +81,28 @@ export default function AdminDashboard() {
           
           <div className="card">
             <div className="card-body" style={{ textAlign: 'center' }}>
-              <h3 style={{ color: '#e53e3e', fontSize: '2.5rem' }}>3</h3>
+              <h3 style={{ color: '#e53e3e', fontSize: '2.5rem' }}>{stats.pending}</h3>
               <p style={{ color: 'var(--text-muted)', fontWeight: 'bold' }}>خطب بانتظار الموافقة</p>
-              <a href="/admin/khutab?status=pending" className="btn btn-outline" style={{ display: 'block', width: '100%', marginTop: '1rem' }}>مراجعة الخطب</a>
+              <a href="/admin/khutab" className="btn btn-outline" style={{ display: 'block', width: '100%', marginTop: '1rem' }}>مراجعة الخطب</a>
             </div>
           </div>
 
           <div className="card">
             <div className="card-body" style={{ textAlign: 'center' }}>
-               <h3 style={{ color: 'var(--accent-gold)', fontSize: '2.5rem' }}>8</h3>
+               <h3 style={{ color: 'var(--accent-gold)', fontSize: '2.5rem' }}>{stats.categories}</h3>
               <p style={{ color: 'var(--text-muted)', fontWeight: 'bold' }}>التصنيفات الحالية</p>
               <a href="/admin/categories" className="btn btn-gold" style={{ display: 'block', width: '100%', marginTop: '1rem' }}>إدارة التصنيفات</a>
             </div>
           </div>
           
+          <div className="card">
+            <div className="card-body" style={{ textAlign: 'center' }}>
+               <h3 style={{ color: 'var(--primary-green)', fontSize: '2.5rem' }}>📚</h3>
+              <p style={{ color: 'var(--text-muted)', fontWeight: 'bold' }}>إدارة زاد الخطيب</p>
+              <a href="/admin/zad-al-khatib" className="btn btn-primary" style={{ display: 'block', width: '100%', marginTop: '1rem' }}>تعديل النصائح والمواد</a>
+            </div>
+          </div>
+
           {user.role === 'admin' && (
             <div className="card">
               <div className="card-body" style={{ textAlign: 'center' }}>

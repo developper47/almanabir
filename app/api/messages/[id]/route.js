@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '../../../../lib/mongodb';
 import Message from '../../../../models/Message';
+import { requireAdmin } from '../../../../lib/auth';
 
-// حذف رسالة
+// حذف رسالة (يتطلب صلاحية المدير العام)
 export async function DELETE(req, { params }) {
   try {
+    const auth = await requireAdmin(req);
+    if (!auth.authorized) return auth.response;
+
     await dbConnect();
     const deletedMessage = await Message.findByIdAndDelete(params.id);
     if (!deletedMessage) {
@@ -16,12 +20,24 @@ export async function DELETE(req, { params }) {
   }
 }
 
-// تحديث حالة الرسالة (مقروءة/غير مقروءة)
+// تحديث حالة الرسالة: مقروءة/غير مقروءة (يتطلب صلاحية المدير العام)
 export async function PATCH(req, { params }) {
   try {
+    const auth = await requireAdmin(req);
+    if (!auth.authorized) return auth.response;
+
     await dbConnect();
     const body = await req.json();
-    const updatedMessage = await Message.findByIdAndUpdate(params.id, { status: body.status }, { new: true });
+
+    if (!['read', 'unread'].includes(body.status)) {
+      return NextResponse.json({ success: false, error: 'حالة غير صالحة' }, { status: 400 });
+    }
+
+    const updatedMessage = await Message.findByIdAndUpdate(
+      params.id,
+      { status: body.status },
+      { new: true }
+    );
     if (!updatedMessage) {
       return NextResponse.json({ success: false, error: 'الرسالة غير موجودة' }, { status: 404 });
     }

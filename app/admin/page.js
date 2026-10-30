@@ -47,9 +47,16 @@ export default function AdminDashboard() {
 
   const roleName = user.role === 'admin' ? 'مدير عام' : user.role === 'visitor' ? 'دارس' : 'عضو';
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth', { method: 'DELETE' });
+    } catch (e) {
+      console.error(e);
+    }
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userRole');
+    localStorage.removeItem('userName');
+    localStorage.removeItem('userEmail');
     router.push('/');
   };
 

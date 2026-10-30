@@ -19,10 +19,16 @@ export default function Navbar() {
     }
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/auth', { method: 'DELETE' });
+    } catch (e) {
+      console.error(e);
+    }
     localStorage.removeItem('isAuthenticated');
     localStorage.removeItem('userName');
     localStorage.removeItem('userRole');
+    localStorage.removeItem('userEmail');
     setUser(null);
     router.push('/');
     router.refresh();

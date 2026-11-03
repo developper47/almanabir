@@ -17,6 +17,8 @@
 .DS_Store
 *.pem
 almanabirDB.txt
+/backups
+exports/
 
 # debug and logs
 npm-debug.log*

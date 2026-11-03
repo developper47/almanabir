@@ -7,6 +7,46 @@ function escapeRegex(string) {
   return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+export function sanitizeUrl(url) {
+  if (!url || typeof url !== 'string') return '';
+  const trimmed = url.trim();
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+      return parsed.href;
+    }
+    return '';
+  } catch {
+    return '';
+  }
+}
+
+export function sanitizeFiles(files) {
+  if (!files || typeof files !== 'object') return {};
+  const clean = {};
+  if (files.youtube) {
+    const safe = sanitizeUrl(files.youtube);
+    if (safe) clean.youtube = safe;
+  }
+  if (files.audio) {
+    const safe = sanitizeUrl(files.audio);
+    if (safe) clean.audio = safe;
+  }
+  if (files.video) {
+    const safe = sanitizeUrl(files.video);
+    if (safe) clean.video = safe;
+  }
+  if (files.pdf) {
+    const safe = sanitizeUrl(files.pdf);
+    if (safe) clean.pdf = safe;
+  }
+  if (files.word) {
+    const safe = sanitizeUrl(files.word);
+    if (safe) clean.word = safe;
+  }
+  return clean;
+}
+
 // جلب كل الخطب أو تصفيتها (متاح للعموم، محمي ضد هجمات ReDoS)
 export async function GET(req) {
   try {
@@ -42,7 +82,7 @@ export async function GET(req) {
   }
 }
 
-// إضافة خطبة جديدة (يتطلب مستخدم مسجل، الأعضاء العاديون تنشر خطبهم كـ 'معلق')
+// إضافة خطبة جديدة (يتطلب مستخدم مسجل، مع تعقيم الروابط لمنع هجمات XSS)
 export async function POST(req) {
   try {
     const auth = await requireAuth(req);
@@ -62,12 +102,15 @@ export async function POST(req) {
     // إذا كان المستخدم ليس مديراً، يتم فرض حالة "معلق" لمراجعة الإدارة
     const status = auth.user.role === 'admin' ? (body.status || 'منشور') : 'معلق';
 
+    // تعقيم روابط المرفقات لضمان عدم وجود روابط ضارة javascript:
+    const safeFiles = sanitizeFiles(files);
+
     const khutba = await Khutba.create({
       title: String(title).trim(),
       preacher: String(preacher).trim(),
       category: String(category).trim(),
-      content: content || '',
-      files: files || {},
+      content: content ? String(content) : '',
+      files: safeFiles,
       status,
       date: body.date || new Date().toLocaleDateString('en-CA'),
       isRare: auth.user.role === 'admin' ? Boolean(isRare) : false,

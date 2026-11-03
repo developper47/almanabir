@@ -8,12 +8,12 @@ export async function GET(req) {
     const { searchParams } = new URL(req.url);
     const token = searchParams.get('token');
 
-    if (!token) {
+    if (!token || typeof token !== 'string') {
       return NextResponse.json({ success: false, error: 'رمز التفعيل مفقود' }, { status: 400 });
     }
 
     const user = await User.findOneAndUpdate(
-      { verificationToken: token },
+      { verificationToken: token.trim() },
       { emailVerified: true, verificationToken: null },
       { new: true }
     );
@@ -22,10 +22,9 @@ export async function GET(req) {
       return NextResponse.json({ success: false, error: 'رمز التفعيل غير صالح أو منتهي الصلاحية' }, { status: 400 });
     }
 
-    // إعادة توجيه المستخدم إلى صفحة تسجيل الدخول مع رسالة نجاح
-    const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-    const host = req.headers.get('host');
-    return NextResponse.redirect(`${protocol}://${host}/auth?verified=true`);
+    // إعادة توجيه المستخدم بأمان إلى صفحة تسجيل الدخول دون الاعتماد على ترويسة Host
+    const redirectUrl = new URL('/auth?verified=true', req.url);
+    return NextResponse.redirect(redirectUrl);
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 400 });
   }

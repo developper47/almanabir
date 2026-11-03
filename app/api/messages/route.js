@@ -3,6 +3,25 @@ import dbConnect from '../../../lib/mongodb';
 import Message from '../../../models/Message';
 import { requireAdmin } from '../../../lib/auth';
 
+// Simple in-memory rate limiter for contact messages
+const messageRateLimits = new Map();
+const MAX_MESSAGES = 5;
+const WINDOW_MS = 10 * 60 * 1000; // 10 minutes
+
+function checkMessageRateLimit(ip) {
+  const now = Date.now();
+  const record = messageRateLimits.get(ip);
+  if (!record || now - record.firstTime > WINDOW_MS) {
+    messageRateLimits.set(ip, { count: 1, firstTime: now });
+    return true;
+  }
+  if (record.count >= MAX_MESSAGES) {
+    return false;
+  }
+  record.count += 1;
+  return true;
+}
+
 // جلب كل الرسائل (يتطلب صلاحية المدير العام)
 export async function GET(req) {
   try {
@@ -17,9 +36,19 @@ export async function GET(req) {
   }
 }
 
-// إضافة رسالة جديدة من نموذج التواصل (متاح للعموم مع التحقق من صحة المدخلات)
+// إضافة رسالة جديدة من نموذج التواصل (متاح للعموم مع التحقق من صحة المدخلات ومكافحة الإغراق)
 export async function POST(req) {
   try {
+    const forwarded = req.headers.get('x-forwarded-for');
+    const ip = forwarded ? forwarded.split(',')[0].trim() : '127.0.0.1';
+
+    if (!checkMessageRateLimit(ip)) {
+      return NextResponse.json(
+        { success: false, error: 'تم إرسال عدد كبير من الرسائل في فترة قصيرة، يرجى المحاولة لاحقاً.' },
+        { status: 429 }
+      );
+    }
+
     await dbConnect();
     const body = await req.json();
     const { name, email, subject, message } = body;

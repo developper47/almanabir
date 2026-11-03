@@ -95,16 +95,29 @@ export default function SingleKhutbaPage({ params }) {
     );
   }
 
-  // تحسين رابط اليوتيوب ليصبح رابط تضمين (Embed)
+  // التحقق من صحة الروابط لمنع هجمات XSS
+  const getSafeUrl = (url) => {
+    if (!url || typeof url !== 'string') return null;
+    const trimmed = url.trim();
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    return null;
+  };
+
+  // تحسين رابط اليوتيوب ليصبح رابط تضمين (Embed) آمن
   const getEmbedUrl = (url) => {
-    if (!url) return null;
-    if (url.includes('youtube.com/watch?v=')) return url.replace('watch?v=', 'embed/');
-    if (url.includes('youtu.be/')) return url.replace('youtu.be/', 'youtube.com/embed/');
-    return url;
+    if (!url || typeof url !== 'string') return null;
+    const trimmed = url.trim();
+    if (!/^https?:\/\//i.test(trimmed)) return null;
+    if (trimmed.includes('youtube.com/watch?v=')) return trimmed.replace('watch?v=', 'embed/');
+    if (trimmed.includes('youtu.be/')) return trimmed.replace('youtu.be/', 'youtube.com/embed/');
+    if (trimmed.includes('youtube.com/embed/')) return trimmed;
+    return null;
   };
 
   const hasMedia = khutba.files && (khutba.files.youtube || khutba.files.video || khutba.files.audio);
-  const hasDocuments = khutba.files && (khutba.files.pdf || khutba.files.word);
+  const safePdfUrl = getSafeUrl(khutba.files?.pdf);
+  const safeWordUrl = getSafeUrl(khutba.files?.word);
+  const hasDocuments = Boolean(safePdfUrl || safeWordUrl);
 
   return (
     <div className="container" style={{ padding: '3rem 1.5rem', maxWidth: '900px' }}>
@@ -202,7 +215,7 @@ export default function SingleKhutbaPage({ params }) {
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               {/* يوتيوب */}
-              {khutba.files.youtube && (
+              {khutba.files.youtube && getEmbedUrl(khutba.files.youtube) && (
                 <div style={{ width: '100%', borderRadius: 'var(--radius-md)', overflow: 'hidden' }}>
                   <iframe 
                     width="100%" height="400" 
@@ -215,21 +228,21 @@ export default function SingleKhutbaPage({ params }) {
               )}
 
               {/* فيديو MP4 مباشر */}
-              {khutba.files.video && (
+              {khutba.files.video && getSafeUrl(khutba.files.video) && (
                 <div style={{ width: '100%', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: '#000' }}>
                   <video width="100%" height="300" controls>
-                    <source src={khutba.files.video} type="video/mp4" />
+                    <source src={getSafeUrl(khutba.files.video)} type="video/mp4" />
                     متصفحك لا يدعم تشغيل الفيديو.
                   </video>
                 </div>
               )}
               
               {/* صوت MP3 */}
-              {khutba.files.audio && (
+              {khutba.files.audio && getSafeUrl(khutba.files.audio) && (
                 <div style={{ background: 'rgba(255,255,255,0.1)', padding: '1.5rem', borderRadius: 'var(--radius-md)', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
                   <strong style={{ whiteSpace: 'nowrap', fontSize: '1.1rem' }}>🎵 استمع للخطبة صوتاً:</strong>
                   <audio controls style={{ width: '100%', flex: 1, minWidth: '200px' }}>
-                    <source src={khutba.files.audio} type="audio/mpeg" />
+                    <source src={getSafeUrl(khutba.files.audio)} type="audio/mpeg" />
                     متصفحك لا يدعم تشغيل الصوت.
                   </audio>
                 </div>
@@ -243,13 +256,13 @@ export default function SingleKhutbaPage({ params }) {
           <div className="doc-section no-print" style={{ background: '#f8f9fa', padding: '1.5rem 2rem', borderBottom: '1px solid #edf2f7' }}>
             <h4 style={{ margin: '0 0 1rem 0', color: 'var(--text-main)' }}>تحميل المرفقات النصية:</h4>
             <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              {khutba.files.pdf && (
-                <a href={khutba.files.pdf} target="_blank" className="btn btn-outline" style={{ flex: 1, justifyContent: 'center', borderColor: '#e53e3e', color: '#e53e3e' }}>
+              {safePdfUrl && (
+                <a href={safePdfUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ flex: 1, justifyContent: 'center', borderColor: '#e53e3e', color: '#e53e3e' }}>
                   📄 تصفح أو تحميل ملف PDF
                 </a>
               )}
-              {khutba.files.word && (
-                <a href={khutba.files.word} target="_blank" className="btn btn-outline" style={{ flex: 1, justifyContent: 'center', borderColor: '#3182ce', color: '#3182ce' }}>
+              {safeWordUrl && (
+                <a href={safeWordUrl} target="_blank" rel="noopener noreferrer" className="btn btn-outline" style={{ flex: 1, justifyContent: 'center', borderColor: '#3182ce', color: '#3182ce' }}>
                   📝 تحميل ملف وورد (Word)
                 </a>
               )}
